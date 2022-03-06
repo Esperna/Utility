@@ -9,6 +9,7 @@ set ignorecase
 set smartcase
 set nocompatible
 filetype plugin on
+set encoding=utf-8
 
 set autoindent
 set autowrite
@@ -33,6 +34,14 @@ set backspace=indent,eol,start
 set clipboard=unnamed
 set showmatch matchtime=1
 "set whichwrap=b,s,h,l,<,>,[,]
+
+" 補完表示時のEnterで改行をしない
+inoremap <expr><CR>  pumvisible() ? "<C-y>" : "<CR>"
+
+set completeopt=menuone,noinsert
+inoremap <expr><C-n> pumvisible() ? "<Down>" : "<C-n>"
+inoremap <expr><C-p> pumvisible() ? "<Up>" : "<C-p>"
+
 
 call plug#begin('~/.vim/plugged')
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
@@ -63,6 +72,9 @@ Plug 'SirVer/ultisnips'
 
 " Snippets are separated from the engine. Add this if you want them:
 Plug 'honza/vim-snippets'
+
+"For automated completion
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 call plug#end()
 
@@ -128,6 +140,7 @@ if has("autocmd")
 endif
 
 autocmd FileType go nnoremap <silent> ge :<C-u>silent call go#expr#complete()<CR>
+autocmd BufWritePre *.go :call CocAction('runCommand', 'editor.action.organizeImport')
 
 " If there are uninstalled bundles found on startup,
 " this will conv
