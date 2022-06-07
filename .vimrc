@@ -77,6 +77,7 @@ inoremap <expr><Caltercation/vim-colors-solarized-p> pumvisible() ? "<Up>" : "<C
 "----------------------------------------------------"
 call plug#begin('~/.vim/plugged')
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
+"Dark Color Scheme
 Plug 'w0ng/vim-hybrid'
 Plug 'altercation/vim-colors-solarized'
 Plug 'croaker/mustang-vim'
@@ -108,6 +109,8 @@ Plug 'honza/vim-snippets'
 
 "For automated completion
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+"For Html Tag
+Plug 'alvan/vim-closetag'
 
 "Clang Formatter
 Plug 'kana/vim-operator-user'
@@ -120,6 +123,8 @@ autocmd FileType c ClangFormatAutoEnable
 let g:go_fmt_command = "goimports"
 let g:syntastic_go_checkers = ['golint', 'govet', 'errcheck']
 
+"For Html Tag
+let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.erb,*.php,*.vue'
 "ディレクトリツリーの操作
 map <C-r> :NERDTreeToggle<CR>
 map <C-n> :cnext<CR>
