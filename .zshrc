@@ -1,13 +1,4 @@
 autoload -Uz colors && colors
-eval "$(pyenv init -)"
-export PATH="$HOME/.anyenv/bin:$PATH"
-eval "$(anyenv init -)"
-export GOPATH=$HOME/go
-export PATH=$GOPATH/bin:$PATH
-export GOENV_ROOT=$HOME/.goenv
-export PATH=$GOENV_ROOT/bin:$PATH
-export PATH=$HOME/.goenv/bin:$PATH
-eval "$(goenv init -)"
 PROMPT="%F{green}%n%f %F{cyan}($(arch))%f:%F{blue}%~%f"$'\n'"%# "
 zstyle ":completion:*:commands" rehash 1
 
