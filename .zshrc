@@ -1,7 +1,13 @@
 autoload -Uz colors && colors
 eval "$(pyenv init -)"
+export PATH="$HOME/.anyenv/bin:$PATH"
+eval "$(anyenv init -)"
 export GOPATH=$HOME/go
 export PATH=$GOPATH/bin:$PATH
+export GOENV_ROOT=$HOME/.goenv
+export PATH=$GOENV_ROOT/bin:$PATH
+export PATH=$HOME/.goenv/bin:$PATH
+eval "$(goenv init -)"
 PROMPT="%F{green}%n%f %F{cyan}($(arch))%f:%F{blue}%~%f"$'\n'"%# "
 zstyle ":completion:*:commands" rehash 1
 
@@ -10,6 +16,8 @@ if type brew &>/dev/null; then
   source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
   autoload -Uz compinit && compinit
 fi
+
+export CPPUTEST_HOME=/usr/local/opt/cpputest
 
 # 重複パスを登録しない
 typeset -U path PATH
@@ -36,3 +44,8 @@ alias gst='git stash'
 alias gsl='git stash list'
 alias gsu='git stash -u'
 alias gsp='git stash pop'
+
+export CPPUTEST_HOME="$(brew --prefix cpputest)"
+
+alias g='cd $(ghq root)/$(ghq list | peco)'
+alias gh='hub browse $(ghq list | peco | cut -d "/" -f 2,3)'
