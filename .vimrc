@@ -76,7 +76,16 @@ inoremap <expr><Caltercation/vim-colors-solarized-p> pumvisible() ? "<Up>" : "<C
 "Plugin"
 "----------------------------------------------------"
 call plug#begin('~/.vim/plugged')
-Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
+"LSP relates setting
+Plug 'prabirshrestha/async.vim'
+Plug 'prabirshrestha/asyncomplete.vim'
+Plug 'prabirshrestha/asyncomplete-lsp.vim'
+Plug 'prabirshrestha/vim-lsp'
+Plug 'mattn/vim-lsp-settings'
+Plug 'mattn/vim-goimports'
+Plug 'mattn/vim-gomod'
+
+
 "Dark Color Scheme
 Plug 'w0ng/vim-hybrid'
 Plug 'altercation/vim-colors-solarized'
@@ -116,15 +125,46 @@ Plug 'alvan/vim-closetag'
 Plug 'kana/vim-operator-user'
 Plug 'rhysd/vim-clang-format'
 
+"Static check
+Plug 'scrooloose/syntastic'
+Plug 'prettier/vim-prettier', { 'do': 'yarn install', 'for': ['javascript', 'typescript', 'css', 'less', 'scss', 'json', 'graphql', 'markdown', 'vue', 'yaml', 'html'] }
+
+
 call plug#end()
 
-autocmd FileType c ClangFormatAutoEnable
+let g:clang_format#style_options = {
+            \ "AccessModifierOffset" : -4,
+            \ "AllowShortIfStatementsOnASingleLine" : "true",
+            \ "AlwaysBreakTemplateDeclarations" : "true",
+            \ "Standard" : "C++11",
+            \ "TabWidth": 4,
+            \ "IndentWidth": 4,
+            \ "ConstructorInitializerIndentWidth": 4,
+            \ "ContinuationIndentWidth": 4,
+            \ "PointerAlignment": "Left"}
+
+autocmd FileType c ClangFormatAutoEnable 
 
 let g:go_fmt_command = "goimports"
 let g:syntastic_go_checkers = ['golint', 'govet', 'errcheck']
 
 "For Html Tag
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.erb,*.php,*.vue'
+
+"Syntax check setting
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_c_checkers = ['splint']
+let g:syntastic_mode_map = {
+    \ 'mode': 'passive',
+    \ 'active_filetypes': ['c']
+    \}
+
 "ディレクトリツリーの操作
 map <C-r> :NERDTreeToggle<CR>
 map <C-n> :cnext<CR>
@@ -190,8 +230,63 @@ if has("autocmd")
 endif
 "----------------------------------------------------"
 
-"Goの指定された式から左側を完成させる
-autocmd FileType go nnoremap <silent> ge :<C-u>silent call go#expr#complete()<CR>
-autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
-command! -nargs=0 OR :silent call CocAction('runCommand', 'editor.action.organizeImport')
+"For Javascript------
+augroup fmt
+autocmd!
+autocmd BufWritePre,TextChanged,InsertLeave *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue,*.svelte,*.yaml,*.html PrettierAsync
+augroup END
+"---------------------
+
+
+function! s:on_lsp_buffer_enabled() abort
+  setlocal omnifunc=lsp#complete
+  setlocal signcolumn=yes
+  nmap <buffer> gd <plug>(lsp-definition)
+  nmap <buffer> <C-]> <plug>(lsp-definition)
+  nmap <buffer> <f2> <plug>(lsp-rename)
+  nmap <buffer> <Leader>d <plug>(lsp-type-definition)
+  nmap <buffer> <Leader>r <plug>(lsp-references)
+  nmap <buffer> <Leader>i <plug>(lsp-implementation)
+  inoremap <expr> <cr> pumvisible() ? "\<c-y>\<cr>" : "\<cr>"
+endfunction
+
+augroup lsp_install
+  au!
+  autocmd User lsp_buffer_enabled call s:on_lsp_buffer_enabled()
+augroup END
+command! LspDebug let lsp_log_verbose=1 | let lsp_log_file = expand('~/lsp.log')
+
+let g:lsp_diagnostics_enabled = 1
+let g:lsp_diagnostics_echo_cursor = 1
+" let g:asyncomplete_auto_popup = 1
+" let g:asyncomplete_auto_completeopt = 0
+let g:asyncomplete_popup_delay = 200
+let g:lsp_text_edit_enabled = 1
+let g:lsp_preview_float = 1
+let g:lsp_diagnostics_float_cursor = 1
+let g:lsp_settings_filetype_go = ['gopls', 'golangci-lint-langserver']
+let g:lsp_settings_filetype_javascriptreact = ['typescript-language-server', 'eslint-language-server']
+
+let g:lsp_settings = {}
+let g:lsp_settings['gopls'] = {
+  \  'workspace_config': {
+  \    'usePlaceholders': v:true,
+  \    'analyses': {
+  \      'fillstruct': v:true,
+  \    },
+  \  },
+  \  'initialization_options': {
+  \    'usePlaceholders': v:true,
+  \    'analyses': {
+  \      'fillstruct': v:true,
+  \    },
+  \  },
+  \}
+
+" For snippets
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+
+set completeopt+=menuone
 
