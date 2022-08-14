@@ -84,7 +84,8 @@ Plug 'prabirshrestha/vim-lsp'
 Plug 'mattn/vim-lsp-settings'
 Plug 'mattn/vim-goimports'
 Plug 'mattn/vim-gomod'
-
+Plug 'hrsh7th/vim-vsnip'
+Plug 'hrsh7th/vim-vsnip-integ'
 
 "Dark Color Scheme
 Plug 'w0ng/vim-hybrid'
@@ -116,8 +117,6 @@ Plug 'SirVer/ultisnips'
 " Snippets are separated from the engine. Add this if you want them:
 Plug 'honza/vim-snippets'
 
-"For automated completion
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
 "For Html Tag
 Plug 'alvan/vim-closetag'
 
@@ -146,7 +145,8 @@ let g:clang_format#style_options = {
 autocmd FileType c ClangFormatAutoEnable 
 
 let g:go_fmt_command = "goimports"
-let g:syntastic_go_checkers = ['golint', 'govet', 'errcheck']
+let g:goimports = 1
+"let g:syntastic_go_checkers = ['golint', 'govet', 'errcheck']
 
 "For Html Tag
 let g:closetag_filenames = '*.html,*.xhtml,*.phtml,*.erb,*.php,*.vue'
@@ -159,7 +159,7 @@ let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
-let g:syntastic_c_checkers = ['splint']
+"let g:syntastic_c_checkers = ['splint']
 let g:syntastic_mode_map = {
     \ 'mode': 'passive',
     \ 'active_filetypes': ['c']
@@ -259,34 +259,20 @@ command! LspDebug let lsp_log_verbose=1 | let lsp_log_file = expand('~/lsp.log')
 let g:lsp_diagnostics_enabled = 1
 let g:lsp_diagnostics_echo_cursor = 1
 " let g:asyncomplete_auto_popup = 1
-" let g:asyncomplete_auto_completeopt = 0
+let g:asyncomplete_auto_completeopt = 0
 let g:asyncomplete_popup_delay = 200
-let g:lsp_text_edit_enabled = 1
+let g:lsp_text_edit_enabled = 0
 let g:lsp_preview_float = 1
 let g:lsp_diagnostics_float_cursor = 1
 let g:lsp_settings_filetype_go = ['gopls', 'golangci-lint-langserver']
 let g:lsp_settings_filetype_javascriptreact = ['typescript-language-server', 'eslint-language-server']
-
-let g:lsp_settings = {}
-let g:lsp_settings['gopls'] = {
-  \  'workspace_config': {
-  \    'usePlaceholders': v:true,
-  \    'analyses': {
-  \      'fillstruct': v:true,
-  \    },
-  \  },
-  \  'initialization_options': {
-  \    'usePlaceholders': v:true,
-  \    'analyses': {
-  \      'fillstruct': v:true,
-  \    },
-  \  },
-  \}
 
 " For snippets
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 
-set completeopt+=menuone
-
+set completeopt+=menuone,noinsert
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
