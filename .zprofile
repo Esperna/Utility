@@ -1,7 +1,5 @@
 export PATH="$HOME/.anyenv/bin:$PATH"
 eval "$(anyenv init -)"
-export GOPATH=$HOME/go
-export PATH=$GOPATH/bin:$PATH
 export GOENV_ROOT=$HOME/.goenv
 export PATH=$GOENV_ROOT/bin:$PATH
 export PATH=$HOME/.goenv/bin:$PATH
