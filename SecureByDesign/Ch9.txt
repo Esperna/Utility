@@ -1,0 +1,59 @@
+(1)ビジネス例外(business exception)とは
+
+ドメインの観点から不正と見なされるアクションをできなくする例外
+不正と見なされるアクションとしては
+
+* 銀行口座から残高を超えた額を引き出そうとすること
+* 既に支払いが済んだ注文に対して新たな商品をその注文に追加しようとすること
+
+(2)技術的例外(technical exception)とは
+
+ドメインルールとは関係なく技術的な観点から不正であると見なされるアクションを防ぐ例外
+不正と見なされるアクションとしては
+
+* メモリー不足であるにも関わらず注文に商品を追加しようとすること
+
+(3)何故技術的例外にビジネスに関するデータを含めてはいけないか
+
+同じ型を使ってビジネス例外と技術的例外の両方を表現している例
+
+
+public Account fetchAccountFor(final Customer customer,
+                               final AccountNumber accountNumber) {
+   notNull(customer);
+   notNull(accountNumber);
+
+   try {
+      return accountDatabase
+            .selectAccountsFor(customer)    //指定した顧客の銀行口座を取得
+            .stream()
+            .filter(account ->              //指定した口座番号と一致する銀行口座のみを選択
+                    account.number().equals(accountNumber))
+            .findFirst()                    //銀行口座の取得
+            .orElseThrow(                   //⭐️該当する銀行口座がない場合は例外をスロー
+              () -> new IllegalStateException(
+                      format("No account matching %s for %s",
+                             accountNumber.value(), customer)));
+   } catch (SQLException e) {
+      throw new IllegalStateException(
+            format("Unable to retrieve account %s for %s",
+                   accountNumber.value(), customer), e);
+   }
+}
+
+1つ目の例外：ビジネス例外
+* 処理が失敗することを伝える際にIllegalExceptionが使われることはよくある
+* 技術的な観点から見ると銀行口座が見つからないことは問題ない
+* ビジネス観点から見ると該当する銀行口座が見つからないことは問題
+    * 「入力された口座番号は間違っています。正しい口座番号を入力してください」等のメッセージをユーザに伝えたくなる
+
+2つ目の例外：技術的例外
+* DBへの接続が失敗したときや実行したSQL文が間違っていたときに発生するもの
+
+
+コメント
+* 今までtry catch等を扱わない環境で開発してたことがほとんどだったので、個人的には
+ビジネス例外にあたるものはfindFirstの戻り値を作って処理を行いたくなってしまう
+
+
+
